@@ -23,7 +23,6 @@ SyncLearn is a research codebase for studying **when and where to synchronize SD
 * `train_ppo_sdnM.py` – **RLlib PPO** training with a Torch MLP actor-critic encoder, same logging/plots/checkpoints as DQN.&#x20;
 * `baselines.py` – Deployable baselines & CLI: **Random**, **Periodic-k (round-robin sync)**, **Greedy-ϕ** (largest per-domain mismatch, tie-break by staleness), and an **Oracle one-step lookahead** (diagnostic). Writes CSV + plots.&#x20;
 * `plots.py` – Convenience scripts to parse logs/metrics and generate comparison charts across algorithms (DQN, PPO, Q-Learning, SARSA).&#x20;
-* `1571191367 paper.pdf` – Submitted manuscript: *“SyncLearn: A Modular RL Framework for Controller Synchronization in Multi-Domain SDN.”*&#x20;
 
 > **Note.** The Gymnasium environment **`gym_sdnM.envs.sdn_envM`** (with `SdnEnvM`, `max_tslots`, `n_domains`) is an external module this repo depends on. Ensure it is installed/available on `PYTHONPATH`. The training scripts assume its observation layout and metrics.
 
@@ -41,9 +40,7 @@ SyncLearn is a research codebase for studying **when and where to synchronize SD
 ### Installation
 
 ```bash
-# (Recommended) new virtualenv/conda environment
-pip install -r requirements.txt   # if you maintain one
-# or install the essentials
+# install the essentials
 pip install gymnasium numpy pandas matplotlib torch "ray[rllib]"
 # make sure gym_sdnM is importable, e.g.:
 pip install -e /path/to/gym_sdnM
@@ -62,8 +59,6 @@ python train_qlearningM3.py --agent qlearning --episodes 800 --steps 30
 # Train SARSA(λ)
 python train_qlearningM3.py --agent sarsa --trace-decay 0.9 --episodes 800 --steps 30
 ```
-
-Artifacts: `experimentos_otro_state_2/<agent>/<exp>/metrics.csv` and PNG plots for reward/APC/Diff/ΔDiff/Sync-cost.&#x20;
 
 **Hyper-parameter search (multiprocess)**
 
@@ -98,27 +93,3 @@ python baselines.py --baseline periodic --k 3       --episodes 300 --steps 30
 python baselines.py --baseline greedy   --phi-th 0.02 --episodes 300 --steps 30
 python baselines.py --baseline oracle   --episodes 100 --steps 30
 ```
-
-Outputs CSV + standard plots; Oracle is slow and for analysis only.&#x20;
-
----
-
-## Results (paper summary)
-
-In unified experiments on a 5-domain network with budgeted sync, **DQN** delivered the **highest reward** and **≈38% lower average discrepancy** than the strongest deployable baseline (**Periodic-k**), at **moderate sync rates**. PPO improved discrepancy over tabular methods but remained sensitive to on-policy tuning under short horizons.&#x20;
-
----
-
-## Reproducing figures & comparisons
-
-* Per-script PNGs are written to each run directory.
-* `plots.py` includes convenience code to parse RLlib logs/metrics and plot algorithm comparisons (mean return, APC, and Diff). Point it to your `metrics.csv` files.&#x20;
-
----
-
-### Notes for contributors
-
-* The environment `gym_sdnM` is treated as an external dependency—PRs that improve setup/validation are welcome.
-* Please keep metric names consistent across scripts (APC, mean\_diff, delta\_diff, sync\_cost, etc.) to preserve comparability in plotting/evaluation.
-
-
